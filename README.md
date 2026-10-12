@@ -6,11 +6,11 @@ Runs on Mac, iPhone and iPad as an installable web app (PWA).
 ## Stack
 
 React 19 + TypeScript + Vite, Tailwind CSS v4, dnd-kit (drag and drop),
-Dexie (IndexedDB, local-first and offline), vite-plugin-pwa.
+Dexie (IndexedDB, local-first and offline), Supabase (sign-in and sync), vite-plugin-pwa.
 
 ## Run it on your Mac
 
-You need Node.js 20 or newer (https://nodejs.org, or `brew install node`).
+You need Node.js 20.19+ or 22.12+ (https://nodejs.org, or `brew install node`).
 
 ```bash
 cd "~/Documents/Claude/Projects/Home Meal Prep helper"
@@ -42,17 +42,38 @@ Offline support and "install" need HTTPS, so deploy it (free) to Vercel or Netli
 
 ## Where data lives
 
-Everything is stored in the browser on each device (IndexedDB). Devices do not sync yet.
-Next step for sync: add Supabase and mirror the three tables in `src/lib/db.ts`.
+Everything is stored in the browser on each device (IndexedDB), so the app works offline.
+Sign in (the dot button in the header) to sync pantry, recipes and plan across devices through Supabase.
+Without `.env.local`, the app runs local-only and the sign-in button is hidden.
+
+### Supabase setup (once)
+
+1. Copy `.env.example` to `.env.local` and fill in the project URL and publishable key
+   (Supabase dashboard, Project Settings, API). Restart `npm run dev` after editing it.
+2. In the dashboard's SQL Editor, run `supabase/schema.sql` (tables, row-level security, realtime).
+3. Authentication, URL Configuration: set the Site URL to where the app is deployed and add
+   `http://localhost:5173` (plus any LAN address you test from) to Redirect URLs.
+4. Google sign-in: in Google Cloud Console, create an OAuth client ID (type "Web application") with
+   the authorized redirect URI `https://<project-ref>.supabase.co/auth/v1/callback`. Paste its client ID
+   and secret into Supabase, Authentication, Sign In / Providers, Google, and enable it.
+5. Email code (fallback): Authentication, Emails, Magic Link template: add `{{ .Token }}` so the email
+   includes a code. Typing the code works in the installed iPhone app, where links open in Safari instead.
+
+How sync works: each local write is queued in an outbox table and pushed to Supabase; changes from
+other devices are pulled by `updated_at` (on launch, focus, every minute and via realtime).
+Deletes are soft (`deleted = true`) so they reach other devices. The last write to reach the server wins.
 
 ## Project layout
 
 ```
 src/
   lib/types.ts         data types, regions, flavors, categories
-  lib/db.ts            Dexie database (pantry, recipes, plan)
+  lib/db.ts            Dexie database (pantry, recipes, plan) and the sync outbox
+  lib/sync.ts          two-way sync with Supabase
+  lib/supabase.ts      Supabase client (reads .env.local)
   lib/seed.ts          starter recipes and pantry
   lib/match.ts         pantry-to-ingredient matching
   lib/dates.ts         week helpers
-  components/Planner.tsx, DayCard.tsx, RecipeLibrary.tsx, RecipeCard.tsx, ShoppingList.tsx, Pantry.tsx
+  components/Planner.tsx, DayCard.tsx, RecipeLibrary.tsx, RecipeCard.tsx, ShoppingList.tsx, Pantry.tsx, SyncButton.tsx
+supabase/schema.sql    database schema to run in Supabase
 ```

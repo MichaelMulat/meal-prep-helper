@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import Planner from './components/Planner'
 import Pantry from './components/Pantry'
+import SyncButton from './components/SyncButton'
 
 type Tab = 'plan' | 'pantry'
 
@@ -14,19 +15,22 @@ export default function App() {
           <h1 className="font-display text-xl font-semibold tracking-tight sm:text-2xl">
             Meal Prep <span className="text-olive">Helper</span>
           </h1>
-          <nav className="flex rounded-full border border-line bg-card p-1 text-sm">
-            {(['plan', 'pantry'] as Tab[]).map((t) => (
-              <button
-                key={t}
-                onClick={() => setTab(t)}
-                className={`rounded-full px-4 py-1.5 font-medium transition ${
-                  tab === t ? 'bg-olive text-paper' : 'text-muted hover:text-ink'
-                }`}
-              >
-                {t === 'plan' ? 'Week plan' : 'Pantry'}
-              </button>
-            ))}
-          </nav>
+          <div className="flex items-center gap-2">
+            <nav className="flex rounded-full border border-line bg-card p-1 text-sm">
+              {(['plan', 'pantry'] as Tab[]).map((t) => (
+                <button
+                  key={t}
+                  onClick={() => setTab(t)}
+                  className={`rounded-full px-4 py-1.5 font-medium transition ${
+                    tab === t ? 'bg-olive text-paper' : 'text-muted hover:text-ink'
+                  }`}
+                >
+                  {t === 'plan' ? 'Week plan' : 'Pantry'}
+                </button>
+              ))}
+            </nav>
+            <SyncButton />
+          </div>
         </div>
       </header>
       <main className="mx-auto max-w-[1400px] px-4 py-5 sm:px-6">

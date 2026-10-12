@@ -26,7 +26,7 @@ export const FLAVORS = [
 ] as const
 
 export interface Recipe {
-  id?: number
+  id?: string
   name: string
   region: string
   flavors: string[]
@@ -36,7 +36,7 @@ export interface Recipe {
 }
 
 export interface PantryItem {
-  id?: number
+  id?: string
   name: string
   quantity: number
   unit: string
@@ -48,7 +48,7 @@ export interface PlanEntry {
   key: string // `${date}|${slot}`
   date: string // YYYY-MM-DD
   slot: MealSlot
-  recipeId: number
+  recipeId: string
 }
 
 export const PANTRY_CATEGORIES = [

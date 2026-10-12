@@ -7,8 +7,8 @@ interface Props {
   date: string
   isToday: boolean
   planByKey: Map<string, PlanEntry>
-  byId: Map<number, Recipe>
-  matches: Map<number, { have: number; total: number; ratio: number }>
+  byId: Map<string, Recipe>
+  matches: Map<string, { have: number; total: number; ratio: number }>
   selected?: Recipe
   onPlace: (slot: MealSlot) => void
   onClear: (key: string) => void

@@ -1,7 +1,10 @@
 import type { PantryItem, Recipe } from './types'
 import { addDays, toISO } from './dates'
 
-export const SEED_RECIPES: Recipe[] = [
+// Fixed ids so every device seeds the same rows and they merge when synced.
+const seedId = (group: number, i: number) => `00000000-0000-4000-800${group}-${String(i + 1).padStart(12, '0')}`
+
+const RECIPES: Omit<Recipe, 'id'>[] = [
   { name: 'Shakshuka', region: 'Middle East', flavors: ['spicy', 'savory'], minutes: 30, meals: ['breakfast', 'lunch'], ingredients: ['eggs', 'canned tomatoes', 'onion', 'bell pepper', 'garlic', 'cumin', 'paprika', 'feta'] },
   { name: 'Overnight oats', region: 'North America', flavors: ['sweet'], minutes: 5, meals: ['breakfast'], ingredients: ['rolled oats', 'milk', 'yogurt', 'honey', 'berries'] },
   { name: 'Huevos rancheros', region: 'Latin America', flavors: ['spicy', 'savory'], minutes: 20, meals: ['breakfast'], ingredients: ['eggs', 'corn tortillas', 'black beans', 'salsa', 'avocado', 'cilantro'] },
@@ -25,9 +28,11 @@ export const SEED_RECIPES: Recipe[] = [
   { name: 'Falafel wraps', region: 'Middle East', flavors: ['herby', 'fresh'], minutes: 35, meals: ['lunch', 'dinner'], ingredients: ['chickpeas', 'parsley', 'garlic', 'cumin', 'pita', 'tahini', 'cucumber', 'tomatoes'] },
 ]
 
+export const SEED_RECIPES: Recipe[] = RECIPES.map((r, i) => ({ ...r, id: seedId(0, i) }))
+
 export function seedPantry(): PantryItem[] {
   const inDays = (n: number) => toISO(addDays(new Date(), n))
-  return [
+  const items: Omit<PantryItem, 'id'>[] = [
     { name: 'eggs', quantity: 12, unit: 'ct', category: 'Dairy & eggs', expires: inDays(10) },
     { name: 'rice', quantity: 2, unit: 'kg', category: 'Grains & pasta' },
     { name: 'onion', quantity: 4, unit: 'ct', category: 'Produce' },
@@ -39,4 +44,5 @@ export function seedPantry(): PantryItem[] {
     { name: 'cumin', quantity: 1, unit: 'jar', category: 'Spices & sauces' },
     { name: 'spinach', quantity: 1, unit: 'bag', category: 'Produce', expires: inDays(2) },
   ]
+  return items.map((p, i) => ({ ...p, id: seedId(1, i) }))
 }

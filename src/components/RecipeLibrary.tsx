@@ -13,12 +13,12 @@ export interface Filters {
 interface Props {
   recipes: Recipe[]
   total: number
-  matches: Map<number, { have: number; total: number; ratio: number }>
+  matches: Map<string, { have: number; total: number; ratio: number }>
   filters: Filters
   onFilters: (f: Filters) => void
   onReset: () => void
-  selectedId: number | null
-  onSelect: (id: number) => void
+  selectedId: string | null
+  onSelect: (id: string) => void
 }
 
 const TIMES = [0, 15, 30, 45]

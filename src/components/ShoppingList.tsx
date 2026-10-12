@@ -5,7 +5,7 @@ import type { PantryItem, PlanEntry, Recipe } from '../lib/types'
 
 interface Props {
   plan: PlanEntry[]
-  byId: Map<number, Recipe>
+  byId: Map<string, Recipe>
   pantry: PantryItem[]
 }
 

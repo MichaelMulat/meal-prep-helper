@@ -24,7 +24,7 @@ const DEFAULT_FILTERS: Filters = { search: '', region: '', flavors: [], maxMinut
 export default function Planner() {
   const [monday, setMonday] = useState(() => startOfWeek(new Date()))
   const [filters, setFilters] = useState<Filters>(DEFAULT_FILTERS)
-  const [selectedId, setSelectedId] = useState<number | null>(null)
+  const [selectedId, setSelectedId] = useState<string | null>(null)
   const [dragLabel, setDragLabel] = useState<string | null>(null)
 
   const dates = useMemo(() => weekDates(monday), [monday])
@@ -56,7 +56,7 @@ export default function Planner() {
 
   const selected = selectedId != null ? byId.get(selectedId) : undefined
 
-  const place = (date: string, slot: MealSlot, recipeId: number) =>
+  const place = (date: string, slot: MealSlot, recipeId: string) =>
     db.plan.put({ key: `${date}|${slot}`, date, slot, recipeId })
   const clearSlot = (key: string) => db.plan.delete(key)
 
@@ -105,8 +105,8 @@ export default function Planner() {
 
   function onDragStart(e: DragStartEvent) {
     const id = String(e.active.id)
-    if (id.startsWith('recipe:')) setDragLabel(byId.get(Number(id.slice(7)))?.name ?? null)
-    else if (id.startsWith('plan:')) setDragLabel(byId.get(planByKey.get(id.slice(5))?.recipeId ?? -1)?.name ?? null)
+    if (id.startsWith('recipe:')) setDragLabel(byId.get(id.slice(7))?.name ?? null)
+    else if (id.startsWith('plan:')) setDragLabel(byId.get(planByKey.get(id.slice(5))?.recipeId ?? '')?.name ?? null)
   }
 
   function onDragEnd(e: DragEndEvent) {
@@ -114,7 +114,7 @@ export default function Planner() {
     if (!e.over) return
     const [date, slot] = String(e.over.id).slice(5).split('|') as [string, MealSlot]
     const id = String(e.active.id)
-    if (id.startsWith('recipe:')) place(date, slot, Number(id.slice(7)))
+    if (id.startsWith('recipe:')) place(date, slot, id.slice(7))
     else if (id.startsWith('plan:')) move(id.slice(5), date, slot)
   }
 
